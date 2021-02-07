@@ -8,12 +8,6 @@ const jwt = require('jsonwebtoken');
 const PRIVATE_KEY_TEST = 'ainaf8392n020n9ge2n0iwgem'; // not a real key so good luck
 
 const { v4: uuidv4, validate: uuidValidate, version: uuidVersion } = require('uuid')
-// UUID
-// https://github.com/uuidjs/uuid
-// secure api
-//https://stackoverflow.com/questions/15496915/how-to-implement-a-secure-rest-api-with-node-js
-// https://medium.com/javascript-in-plain-english/securing-express-js-api-using-jwt-b2834325d2e8
-// https://github.com/bewarusman/node-file-upload/blob/master/index.js
 
 const uuidValidateV4 = uuid => {
     return uuidValidate(uuid) && uuidVersion(uuid) === 4;

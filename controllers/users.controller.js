@@ -2,9 +2,6 @@ const bcrypt = require("bcrypt");
 const mongoose = require("mongoose");
 const { v4: uuidv4, validate: uuidValidate, version: uuidVersion } = require('uuid')
 
-// https://www.comparitech.com/net-admin/secure-mongodb/
-// https://blog.jeremylikness.com/blog/2018-12-27_mongodb-on-windows-in-minutes-with-docker/
-
 const jwt = require('jsonwebtoken');
 const secret = process.env.JWT_SECRET;
 
