@@ -1,9 +1,11 @@
 const bcrypt = require("bcrypt");
-const mongoose = require("mongoose");
-const { v4: uuidv4, validate: uuidValidate, version: uuidVersion } = require('uuid')
 
 const jwt = require('jsonwebtoken');
 const secret = process.env.JWT_SECRET;
+
+const db = require("../models");
+const User = db.user;
+const Role = db.roles;
 
 const uuidValidateV4 = uuid => {
     return uuidValidate(uuid) && uuidVersion(uuid) === 4;
@@ -11,30 +13,85 @@ const uuidValidateV4 = uuid => {
 
 
 // actions
-const loginUser = (req, res, next) => {
-    // TODO: add user/password check in a database
-    // create a random ID for testing
-    const TEST_UUID = uuidv4();
-    const uuidIsValid = uuidValidateV4(TEST_UUID);
+const signupUser = (req, res) => {
+    const user = new User({
+        username: req.body.username,
+        email: req.body.email,
+        hash: bcrypt.hashSync(req.body.password, 8)
+    })
 
-    if (uuidIsValid) {
-        jwt.sign(
-            { id: TEST_UUID },
-            secret,
-            { expiresIn: '15s' },
-            (err, token) => {
-                if (err) { res.sendStatus(500); }
-                else {
-                    res.json({
-                        success: true,
-                        user: { uuid: TEST_UUID },
-                        token
-                    })
+    if(req.body.roles) {
+        Role.find(
+            {
+                name: { $in: req.body.roles }
+            },
+            (err, roles) => {
+                if(err) {
+                    res.status(500).send({ message: err})
+                    return;
                 }
-            })
+
+                user.roles = roles.map(role => role._id);
+                
+                user.save(err => {
+                    if (err) {
+                        res.status(500).send({ message: err });
+                        return;
+                    }
+
+                    res.send({ message: 'User was registered successfully!' })
+                })
+            }
+        )
     } else {
-        res.sendStatus(401)
+        Role.findOne({ name: 'user'}, (err, role) => {
+            if (err) {
+                res.status(500().send({ message: err }))
+                return;
+            }
+
+            user.roles = [role._id];
+            user.save(err => {
+                if (err) {
+                    res.status(500).send({ message: err});
+                    return;
+                }
+
+                res.send({ message: 'User was registered successfully!' })
+            })
+        })
     }
+}
+const loginUser = async (req, res) => {
+    const { username, password } = req.body;
+    const user = await User.findOne({username});
+
+    console.log(user)
+    if(user == null) {
+        return res.sendStatus(401);
+    }
+    bcrypt.compare(password, user.hash, (err, result) => {
+        if (err || !result) {
+            res.sendStatus(401);
+        } else {
+            jwt.sign({ id: user._id }, secret, { expiresIn: '24h' }, (err, token) => {
+                    if (err) { res.sendStatus(500); }
+                    else {
+                        res.json({
+                            success: true,
+                            user: { username: user.username },
+                            token
+                        })
+                    }
+                })
+        }
+        
+    })
+}
+
+const getUsers = async (req, res) => {
+    const users = await User.find({});
+    res.json(users);
 }
 
 const TEST_SECURE_ENDPOINT = (req, res, next) => {
@@ -42,7 +99,9 @@ const TEST_SECURE_ENDPOINT = (req, res, next) => {
     res.send('User is authed')
 }
 module.exports = {
+    signupUser,
     loginUser,
+    getUsers,
     TEST_SECURE_ENDPOINT
 }
 
