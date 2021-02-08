@@ -6,7 +6,9 @@ const {
     signupUser,
     loginUser,
     getUsers,
-    TEST_SECURE_ENDPOINT
+    getUser,
+    deleteUser,
+    updateUser,
 } = require('../controllers/users.controller');
 
 router.use((req, res, next) => {
@@ -22,10 +24,12 @@ router.route('/auth/signup')
 router.route('/auth/login')
     .post(loginUser)
 
-router.route('/auth/securetest')
-    .get(authJWT, TEST_SECURE_ENDPOINT)
-
 router.route('/users')
     .get(authJWT, getUsers)
+    .delete(authJWT, deleteUser)
+    
+router.route('/users/:id')
+    .get(authJWT, getUser)
+    .put(authJWT, updateUser)
 
 module.exports = router;

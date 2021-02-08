@@ -1,6 +1,7 @@
 const bcrypt = require("bcrypt");
 
 const jwt = require('jsonwebtoken');
+const { user } = require("../models");
 const secret = process.env.JWT_SECRET;
 
 const db = require("../models");
@@ -66,7 +67,6 @@ const loginUser = async (req, res) => {
     const { username, password } = req.body;
     const user = await User.findOne({username});
 
-    console.log(user)
     if(user == null) {
         return res.sendStatus(401);
     }
@@ -89,20 +89,67 @@ const loginUser = async (req, res) => {
     })
 }
 
+const deleteUser = async (req, res) => {
+    User.deleteOne({_id: req.body._id}, (err, user) => {
+        if (err) return res.status(404).send({
+            ok: false,
+            message: 'User not found'
+        });
+
+        res.send({
+            ok: true,
+            message: 'User deleted',
+            user
+        })
+    })
+}
+
+const updateUser = async (req, res) => {
+    const {id} = req.params;
+    const { email, firstName, lastName, bio, 
+        location, company, avatar, website, 
+        social, roles }  = req.body;    
+    const body = Object.entries(req.body)
+    
+    User.findOne({ _id: id }, (err, user) => {
+        if (err) {
+            res.status(500().send({ message: err }))
+            return;
+        }
+
+        for (const [key, val] of body) {
+            console.log(`${key} : ${val}`)
+            // TODO: add a check if key exists in User
+            user[key] = val
+        }
+
+        user.save(err => {
+            if (err) {
+                res.status(500).send({ message: err });
+                return;
+            }
+
+            res.send({ message: 'User was updated successfully!', user })
+        })
+    })
+}
+
+const getUser = async (req, res) => {
+    const user = await User.find({_id: req.params.id})
+    res.json(user[0])
+}
 const getUsers = async (req, res) => {
     const users = await User.find({});
     res.json(users);
 }
 
-const TEST_SECURE_ENDPOINT = (req, res, next) => {
-    const { uuid } = req.params;
-    res.send('User is authed')
-}
 module.exports = {
     signupUser,
     loginUser,
     getUsers,
-    TEST_SECURE_ENDPOINT
+    getUser,
+    deleteUser,
+    updateUser,
 }
 
 

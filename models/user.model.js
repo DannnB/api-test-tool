@@ -6,12 +6,12 @@ const User = mongoose.model(
         username: { type: String, required: true },
         email: { type: String, required: true },
         hash: { type: String, required: true },
-        firstName: String,
-        lastName: String,
-        bio: String,
-        location: String,
-        company: String,
-        avatar: String,
+        firstName: { type: String },
+        lastName: { type: String },
+        bio: { type: String },
+        location: { type: String },
+        company: { type: String },
+        avatar: { type: String },
         website: [
             {
                 url: String
