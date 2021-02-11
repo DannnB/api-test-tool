@@ -1,9 +1,18 @@
+
 // actions
+
+const addMedia = (req, res, next) => {
+    res.send(res.body)
+}
+const optionsMedia = (req, res, next) => {
+    res.send('options media')
+}
 const getMedia = (req, res, next) => {
+    console.log(req.headers)
     const TEST_DATA = [
         {
             "id": "opjaiafjwgj04t904g3n90rg0",
-            "name": "Project One",
+            "name": "Project One2",
             "tagline": "The tagline of this item",
             "description": "A description goes here...",
             "tags": ["CSS", "HTML", "PHP", "WORDPRESS", "SEO"],
@@ -33,10 +42,12 @@ const getMedia = (req, res, next) => {
             ]
         }
     ]
-
+    // console.log(req.headers)
     res.json(TEST_DATA);
 }
 
 module.exports = {
-    getMedia
+    getMedia,
+    addMedia,
+    optionsMedia
 }

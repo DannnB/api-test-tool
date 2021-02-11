@@ -63,7 +63,7 @@ const signupUser = (req, res) => {
         })
     }
 }
-const loginUser = async (req, res) => {
+const loginUser = async (req, res, next) => {
     const { username, password } = req.body;
     const user = await User.findOne({username});
 
@@ -77,11 +77,25 @@ const loginUser = async (req, res) => {
             jwt.sign({ id: user._id }, secret, { expiresIn: '24h' }, (err, token) => {
                     if (err) { res.sendStatus(500); }
                     else {
-                        res.json({
+                        res.cookie('AccessToken', token, {
+                            expires: new Date(new Date().getTime() + 30 * 1000),
+                            sameSite: 'strict',
+                            httpOnly: true,
+                        }).json({
                             success: true,
                             user: { username: user.username },
                             token
                         })
+                        // res.json({
+                        //     success: true,
+                        //     user: { username: user.username },
+                        //     token
+                        // })
+                        //     .cookie('AccessToken', token, {
+                        //     expires: new Date(new Date().getTime() + 30 * 1000),
+                        //     sameSite: 'strict',
+                        //     httpOnly: true,
+                        // })
                     }
                 })
         }
