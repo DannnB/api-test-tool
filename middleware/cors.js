@@ -17,7 +17,7 @@ module.exports.cors = () => {
         },
         credentials: true,
         methods: 'GET, HEAD, PUT, PATCH, POST, DELETE, OPTIONS',
-        'preflightContinue': false,
+        'preflightContinue': true,
 
         //  exposedHeaders: ['Content-Length', 'X-Foo', 'X-Bar'],
         //credentials: true,
