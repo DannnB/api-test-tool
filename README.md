@@ -20,3 +20,6 @@ https://github.com/bewarusman/node-file-upload/blob/master/index.js
 
 UUID
 https://github.com/uuidjs/uuid
+
+### Dev setup
+https://www.smashingmagazine.com/2020/04/express-api-backend-project-postgresql/
