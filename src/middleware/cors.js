@@ -1,5 +1,5 @@
 const cors = require('cors')
-var allowedOrigins = ['http://localhost:3000', 'app.codehubble.com']
+var allowedOrigins = ['http://localhost:3000', 'http://localhost:8080', 'app.codehubble.com']
 
 module.exports.cors = () => {
     const corsOptions = {
@@ -7,7 +7,7 @@ module.exports.cors = () => {
             // allow requests with no origin
             // (like mobile apps or curl requests)
             if (!origin) return callback(null, true);
-            console.log("Origin: ", origin)
+            // console.log("Origin: ", origin)
             if (allowedOrigins.indexOf(origin) === -1 || !origin || origin == undefined) {
                 const error = `The CORS policy for this site does not allow access from the specified Origin. Please contact an MMC official if you require legitimate access.`;
                 //	return callback("error123", false)
@@ -15,6 +15,9 @@ module.exports.cors = () => {
             }
             return callback(null, true);
         },
+        credentials: true,
+        methods: 'GET, HEAD, PUT, PATCH, POST, DELETE, OPTIONS',
+        'preflightContinue': true,
 
         //  exposedHeaders: ['Content-Length', 'X-Foo', 'X-Bar'],
         //credentials: true,

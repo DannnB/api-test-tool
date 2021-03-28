@@ -63,7 +63,7 @@ const signupUser = (req, res) => {
         })
     }
 }
-const loginUser = async (req, res) => {
+const loginUser = async (req, res, next) => {
     const { username, password } = req.body;
     const user = await User.findOne({username});
 
@@ -77,11 +77,25 @@ const loginUser = async (req, res) => {
             jwt.sign({ id: user._id }, secret, { expiresIn: '24h' }, (err, token) => {
                     if (err) { res.sendStatus(500); }
                     else {
-                        res.json({
+                        res.cookie('AccessToken', token, {
+                            expires: new Date(new Date().getTime() + 30 * 1000),
+                            sameSite: 'strict',
+                            httpOnly: true,
+                        }).json({
                             success: true,
                             user: { username: user.username },
                             token
                         })
+                        // res.json({
+                        //     success: true,
+                        //     user: { username: user.username },
+                        //     token
+                        // })
+                        //     .cookie('AccessToken', token, {
+                        //     expires: new Date(new Date().getTime() + 30 * 1000),
+                        //     sameSite: 'strict',
+                        //     httpOnly: true,
+                        // })
                     }
                 })
         }
@@ -90,8 +104,15 @@ const loginUser = async (req, res) => {
 }
 
 const deleteUser = async (req, res) => {
-    User.deleteOne({_id: req.body._id}, (err, user) => {
-        if (err) return res.status(404).send({
+    const { _id } = req.body;
+
+    if (_id === undefined) return res.status(400).send({
+        ok: false,
+        message: 'User ID is required.'
+    })
+
+    User.deleteOne({_id: _id}, (err, user) => {
+        if (err || !user.deletedCount) return res.status(404).send({
             ok: false,
             message: 'User not found'
         });
@@ -135,8 +156,41 @@ const updateUser = async (req, res) => {
 }
 
 const getUser = async (req, res) => {
-    const user = await User.find({_id: req.params.id})
-    res.json(user[0])
+    if (!req.params.id) {
+        return res.status(400).send({
+            ok: false,
+            message: 'User ID is required.'
+        })
+    }
+
+    User.find({_id: req.params.id}, (err, user) => {
+        if (err) return res.status(404).send({
+            ok: false,
+            message: 'User not found.'
+        });
+
+        res.send({
+            ok: true,
+            message: 'User Found.',
+            user
+        })
+    })
+
+    // try {
+    //     console.log(await User.find({ _id: req.params.id }))
+    //     // const user = await User.find({_id: req.params.id})
+    // } catch (err) {
+    //     res.status(500).send({ message: err });
+    //     return;
+    // }
+
+    // if(!user) {
+    //     return res.status(404).send({
+    //         ok: false,
+    //         message: 'User not found'
+    //     })
+    // }
+    // return res.json(user[0])
 }
 const getUsers = async (req, res) => {
     const users = await User.find({});
