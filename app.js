@@ -68,10 +68,9 @@ const initial = () => {
 
 const app = express();
 
-app.use(require('./middleware/cors').cors({ credentials: true, origin: true }))
 app.use(logger('dev'));
 app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
+app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 app.disable('x-powered-by');

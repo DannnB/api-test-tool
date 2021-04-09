@@ -1,14 +1,5 @@
-
 // actions
-
-const addMedia = (req, res, next) => {
-    res.send(res.body)
-}
-const optionsMedia = (req, res, next) => {
-    res.send('options media')
-}
 const getMedia = (req, res, next) => {
-    // console.log(req.headers)
     const TEST_DATA = [
         {
             "id": "opjaiafjwgj04t904g3n90rg0",
@@ -42,12 +33,10 @@ const getMedia = (req, res, next) => {
             ]
         }
     ]
-    // console.log(req.headers)
+
     res.json(TEST_DATA);
 }
 
 module.exports = {
-    getMedia,
-    addMedia,
-    optionsMedia
+    getMedia
 }
